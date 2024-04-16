@@ -1,8 +1,9 @@
 export class Prop {
-    constructor(propName, propParamName, disabled = false){
+    constructor(propName, propParamName, hidden = false, editor = null){
         this.propName = propName
         this.propParamName = propParamName
-        this.disabled = disabled
+        this.hidden = hidden
+        this.editor = editor
     }
 }
 

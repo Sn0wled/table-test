@@ -2,8 +2,9 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import TBody from "./TBody";
 import THead from "./THead";
+import "./Table.css"
 
-export default function Table({entity, needUpdate, setNeedUpdate}){
+export default function Table({entity, needUpdate, setNeedUpdate, selected, setSelected}){
     const [data, setData] = useState([])
     const [isLoading, setIsLoading] = useState(true)
     const [error, setError] = useState(null)
@@ -20,7 +21,6 @@ export default function Table({entity, needUpdate, setNeedUpdate}){
     useEffect(() => {
         if (needUpdate){
             getFunc()
-            setNeedUpdate(false)
         }
     }, [needUpdate])
     if (isLoading){
@@ -30,10 +30,12 @@ export default function Table({entity, needUpdate, setNeedUpdate}){
         return <h2>Ошибка: {error.response.data.message}</h2>
     }
 
+    const sortedData = sortData()
+
     return(
         <table>
             <THead propList={entity.propList} setSortProp={setSortProp} setReverseSort = {setReverseSort} reverseSort={reverseSort} sortPropName={sortParam}/>
-            <TBody data={sortedData()} entity={entity}/>
+            <TBody data={sortedData} entity={entity} selected={selected} setSelected={setSelected}/>
         </table>
     )
 
@@ -41,7 +43,10 @@ export default function Table({entity, needUpdate, setNeedUpdate}){
         axios.get(entity.url)
         .then(p => p.data)
         .then(data => setData(data))
-        .then(() => setIsLoading(false))
+        .then(() => {
+            setIsLoading(false)
+            setNeedUpdate(false)
+        })
         .catch(error => {
             setError(error)
             setIsLoading(false)
@@ -51,7 +56,7 @@ export default function Table({entity, needUpdate, setNeedUpdate}){
         })
     }
 
-    function sortedData(){
+    function sortData(){
         const newData = [...data]
         newData.sort(sortFunc)
         return newData
